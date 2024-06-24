@@ -35,7 +35,7 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.sparkbutton)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
