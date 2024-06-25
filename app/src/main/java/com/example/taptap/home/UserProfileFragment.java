@@ -52,9 +52,12 @@ public class UserProfileFragment extends Fragment {
         mBinding.nameTextview.setText(user.getNickname());
 
         mBinding.backButton.setOnClickListener(item->{
-            FragmentManager fragmentManager = (getActivity()).getSupportFragmentManager();// must be fragmentmanager of the activity
+            FragmentManager fragmentManager= getActivity().getSupportFragmentManager();
+            fragmentManager.popBackStack();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.frame_layout, new HomeFragment());
+            Fragment homeFragment = fragmentManager.findFragmentByTag(HomeFragment.class.getName());
+            assert homeFragment != null;
+            fragmentTransaction.show(homeFragment);
             fragmentTransaction.commit();
         });
         return mBinding.getRoot();

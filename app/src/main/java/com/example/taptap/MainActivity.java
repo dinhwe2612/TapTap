@@ -1,6 +1,7 @@
 package com.example.taptap;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,27 +55,44 @@ public class MainActivity extends AppCompatActivity {
             Repository.getInstance().addContent(content);
         }
 
-        replaceFragment(new HomeFragment());
+        switchFragment(HomeFragment.class.getName());
 
         mBinding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int idItem = item.getItemId();
             if (idItem == R.id.home_menu) {
-                replaceFragment(new HomeFragment());
+                switchFragment(HomeFragment.class.getName());
             } else if (idItem == R.id.shopping_menu) {
-                replaceFragment(new ShopFragment());
+                switchFragment(ShopFragment.class.getName());
             } else if (idItem == R.id.message_menu) {
-                replaceFragment(new MessageFragment());
+                switchFragment(MessageFragment.class.getName());
             } else if (idItem == R.id.profile_menu) {
-                replaceFragment(new ProfileFragment());
+                switchFragment(ProfileFragment.class.getName());
             }
             return true;
         });
     }
 
-    private void replaceFragment(Fragment fragment) {
+    public void switchFragment(String fragmentClassName) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.frame_layout, fragment);
+
+        //Hide all current fragment
+        for (Fragment fragment : fragmentManager.getFragments()) {
+            fragmentTransaction.hide(fragment);
+        }
+
+        Fragment targetFragment = fragmentManager.findFragmentByTag(fragmentClassName);
+        if (targetFragment == null) {
+            try{
+                //this method should include handling exception
+                targetFragment = (Fragment)Class.forName(fragmentClassName).newInstance();
+                fragmentTransaction.add(R.id.frame_layout, targetFragment, fragmentClassName);
+            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+                Log.e("MainActivity", "Error instantiating fragment", e);
+            }
+        } else {
+            fragmentTransaction.show(targetFragment);
+        }
         fragmentTransaction.commit();
     }
 }

@@ -1,5 +1,7 @@
 package com.example.taptap.home;
 
+import static android.app.PendingIntent.getActivity;
+
 import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -11,6 +13,7 @@ import android.view.Window;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
@@ -55,12 +58,17 @@ public class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ContentH
             Content content = Repository.getInstance().getContentById(position);
             if (content == null) {
                 // handle error
+            } else {
+                User user = content.getContentOwner();
+                FragmentManager fragmentManager = ((MainActivity)item.getContext()).getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.add(R.id.frame_layout, UserProfileFragment.newInstance(Integer.toString(user.getId())));
+                fragmentTransaction.addToBackStack(null);
+                Fragment homeFragment = fragmentManager.findFragmentByTag(HomeFragment.class.getName());
+                assert homeFragment != null;
+                fragmentTransaction.hide(homeFragment);
+                fragmentTransaction.commit();
             }
-            User user = content.getContentOwner();
-            FragmentManager fragmentManager = ((MainActivity)item.getContext()).getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.frame_layout, UserProfileFragment.newInstance(Integer.toString(user.getId())));
-            fragmentTransaction.commit();
         });
     }
 
